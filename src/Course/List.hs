@@ -76,7 +76,8 @@ headOr ::
   -> List a
   -> a
 headOr =
-  error "todo: Course.List#headOr"
+  foldRight const
+  
 
 -- | The product of the elements of a list.
 --
@@ -89,7 +90,7 @@ product ::
   List Int
   -> Int
 product =
-  error "todo: Course.List#product"
+  foldLeft (*) 1
 
 -- | Sum the elements of the list.
 --
@@ -104,7 +105,7 @@ sum ::
   List Int
   -> Int
 sum =
-  error "todo: Course.List#sum"
+  foldLeft (+) 0
 
 -- | Return the length of the list.
 --
@@ -116,7 +117,7 @@ length ::
   List a
   -> Int
 length =
-  error "todo: Course.List#length"
+  foldRight (const (+1)) 0
 
 -- | Map the given function on each element of the list.
 --
@@ -131,7 +132,7 @@ map ::
   -> List a
   -> List b
 map =
-  error "todo: Course.List#map"
+  flip foldRight Nil . ((:.) .)
 
 -- | Return elements satisfying the given predicate.
 --
