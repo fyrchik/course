@@ -16,6 +16,7 @@ module Course.Applicative(
 , return
 , fail
 , (>>)
+, bool
 ) where
 
 import Course.Core
@@ -302,8 +303,8 @@ fa *> fb =
   f b
   -> f a
   -> f b
-(<*) =
-  flip (*>)
+fa <* fb =
+  const <$> fa <*> fb
 
 -- | Sequences a list of structures to a structure of list.
 --
@@ -326,7 +327,7 @@ sequence ::
   List (f a)
   -> f (List a)
 sequence =
-  undefined
+  foldRight (lift2 (:.)) (pure Nil)
 
 -- | Replicate an effect a given number of times.
 --
@@ -350,7 +351,7 @@ replicateA ::
   -> f a
   -> f (List a)
 replicateA =
-  error "todo: Course.Applicative#replicateA"
+  (sequence .) . replicate
 
 -- | Filter a list with a predicate that produces an effect.
 --
@@ -372,14 +373,20 @@ replicateA =
 -- >>> filtering (const $ True :. True :.  Nil) (1 :. 2 :. 3 :. Nil)
 -- [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]]
 --
+
+bool :: (a -> a) -> a -> Bool -> a
+bool fun arg c = if c then fun arg else arg
+
 filtering ::
   Applicative f =>
   (a -> f Bool)
   -> List a
   -> f (List a)
-filtering =
-  error "todo: Course.Applicative#filtering"
-
+filtering g =
+  foldRight (\a b -> lift3 bool (pure (a:.)) b (g a)) (pure Nil)
+-- if you take 'bool f t c = if c then t else f' (like in Data.Bool), you get
+-- wrong solution: foldRight (\a b -> lift3 bool b ((a:.) <$> b) (g a)) (pure Nil)
+-- because argument 'b' is included twice and hence 'lifted' twice
 -----------------------
 -- SUPPORT LIBRARIES --
 -----------------------
