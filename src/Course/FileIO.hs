@@ -62,7 +62,7 @@ the contents of c
 main ::
   IO ()
 main =
-  error "todo: Course.FileIO#main"
+  getArgs >>= foldRight ((*>) . run) (return ()) -- works with multiple arguments
 
 type FilePath =
   Chars
@@ -71,31 +71,31 @@ type FilePath =
 run ::
   Chars
   -> IO ()
-run =
-  error "todo: Course.FileIO#run"
+run name =
+  readFile name >>= getFiles . lines >>= printFiles
 
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
 getFiles =
-  error "todo: Course.FileIO#getFiles"
+  sequence . (getFile <$>)
 
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
 getFile =
-  error "todo: Course.FileIO#getFile"
+  lift2 (<$>) (,) readFile
+-- getFile name = readFile name >>= return . (,) name
 
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
 printFiles =
-  error "todo: Course.FileIO#printFiles"
+  void . sequence . (uncurry printFile <$>)
+-- foldRight ((*>) . uncurry printFile) (return ())
 
 printFile ::
   FilePath
   -> Chars
   -> IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
-
+printFile n c = putStrLn ("============ " ++ n) *> putStrLn c
