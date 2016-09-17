@@ -100,7 +100,7 @@ instance Applicative List where
     -> List a
     -> List b
   gs <*> x =
-    flatMap (flip map x) gs
+    flatMap (`map` x) gs
 
 -- | Insert into an Optional.
 --
@@ -276,8 +276,8 @@ lift4 g fa fb fc fd =
   f a
   -> f b
   -> f b
-fa *> fb =
-  flip const <$> fa <*> fb -- (<*>) . (flip const <$>)
+(*>) =
+  lift2 (const id)
 
 -- | Apply, discarding the value of the second argument.
 -- Pronounced, left apply.
@@ -302,8 +302,8 @@ fa *> fb =
   f b
   -> f a
   -> f b
-fa <* fb =
-  const <$> fa <*> fb
+(<*) =
+  lift2 const
 
 -- | Sequences a list of structures to a structure of list.
 --
@@ -373,16 +373,13 @@ replicateA =
 -- [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]]
 --
 
-bool :: (a -> a) -> a -> Bool -> a
-bool fun arg c = if c then fun arg else arg
-
 filtering ::
   Applicative f =>
   (a -> f Bool)
   -> List a
   -> f (List a)
 filtering g =
-  foldRight (\a b -> lift3 bool (pure (a:.)) b (g a)) (pure Nil)
+  foldRight (\a -> lift2 (\c -> if c then (a:.) else id) (g a)) (pure Nil)
 -- if you take 'bool f t c = if c then t else f' (like in Data.Bool), you get
 -- wrong solution: foldRight (\a b -> lift3 bool b ((a:.) <$> b) (g a)) (pure Nil)
 -- because argument 'b' is included twice and hence 'lifted' twice
