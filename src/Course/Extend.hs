@@ -10,7 +10,9 @@ import Course.List
 import Course.Optional
 import Course.Functor
 
--- | All instances of the `Extend` type-class must satisfy one law. This law
+-- | All instances of 
+--
+-- the `Extend` type-class must satisfy one law. This law
 -- is not checked by the compiler. This law is given as:
 --
 -- * The law of associativity
@@ -34,7 +36,7 @@ instance Extend Id where
     -> Id a
     -> Id b
   (<<=) =
-    error "todo: Course.Extend (<<=)#instance Id"
+    ((Id $) .) -- f <<= a := Id (f a)
 
 -- | Implement the @Extend@ instance for @List@.
 --
@@ -52,7 +54,7 @@ instance Extend List where
     -> List a
     -> List b
   (<<=) =
-    error "todo: Course.Extend (<<=)#instance List"
+     undefined -- went reading more :D 
 
 -- | Implement the @Extend@ instance for @Optional@.
 --
@@ -67,7 +69,7 @@ instance Extend Optional where
     -> Optional a
     -> Optional b
   (<<=) =
-    error "todo: Course.Extend (<<=)#instance Optional"
+    (Full 
 
 -- | Duplicate the functor using extension.
 --
