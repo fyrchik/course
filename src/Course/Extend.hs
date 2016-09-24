@@ -36,7 +36,7 @@ instance Extend Id where
     -> Id a
     -> Id b
   (<<=) =
-    ((Id $) .) -- f <<= a := Id (f a)
+    ((Id $) .) -- Id (f a)
 
 -- | Implement the @Extend@ instance for @List@.
 --
@@ -54,7 +54,10 @@ instance Extend List where
     -> List a
     -> List b
   (<<=) =
-     undefined -- went reading more :D 
+     (. tails) . map
+      where tails = foldRight (\x y -> (x :. headOr Nil y) :. y) Nil
+     -- another possibility (not satisfying examples tho and useless)
+     -- (<<=) == (return .) == ((:. Nil) .)
 
 -- | Implement the @Extend@ instance for @Optional@.
 --
@@ -69,7 +72,9 @@ instance Extend Optional where
     -> Optional a
     -> Optional b
   (<<=) =
-    (Full 
+    (. (bindOptional (Full . Full))) . (<$>)
+    -- again, there is another possibility (not satisfying 2nd example)
+    -- (<<=) == (return .) == (Full .)
 
 -- | Duplicate the functor using extension.
 --
@@ -89,4 +94,4 @@ cojoin ::
   f a
   -> f (f a)
 cojoin =
-  error "todo: Course.Extend#cojoin"
+  (<<=) id
