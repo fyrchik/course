@@ -603,7 +603,7 @@ personParser =
   sp smokerParser `flbindParser` (\rsmoker ->
   sp phoneParser `flbindParser` (\rphone ->
   valueParser $ Person rage fname sname rsmoker rphone)))))
-    where sp p = list1 space >>> p
+    where sp p = spaces1 >>> p
 
 -- Make sure all the tests pass!
 
