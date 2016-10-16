@@ -421,4 +421,4 @@ betweenSepbyComma ::
   -> Parser a
   -> Parser (List a)
 betweenSepbyComma lc rc p = -- we use 'charTok', so spaces in between are acceptable
-  betweenCharTok lc rc (sepby p (is ','))
+  betweenCharTok lc rc (sepby p (charTok ','))
