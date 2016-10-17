@@ -110,7 +110,20 @@ toSpecialCharacter c =
 jsonString ::
   Parser Chars
 jsonString =
-  error "todo: Course.JsonParser#jsonString"
+  between dquote dquote (list (parseSpecialOrUnicode ||| noneof "\"\\"))
+    where dquote = is '"'
+
+parseSpecialOrUnicode ::
+  Parser Char
+parseSpecialOrUnicode =
+  do
+    is '\\'
+    c <- character
+    case toSpecialCharacter c of
+      Full x -> pure (fromSpecialCharacter x)
+      Empty  -> case c of
+                  'u' -> hex
+                  _   -> unexpectedCharParser c
 
 -- | Parse a JSON rational.
 --
