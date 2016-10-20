@@ -83,7 +83,10 @@ data Op =
 convertInteractive ::
   IO ()
 convertInteractive =
-  error "todo: Course.Interactive#convertInteractive"
+  putStrLn "Enter string to convert:" >-
+  getLine >>= \s ->
+  putStr "converted: " >-
+  putStrLn (toUpper <$> s)
 
 -- |
 --
@@ -111,7 +114,13 @@ convertInteractive =
 reverseInteractive ::
   IO ()
 reverseInteractive =
-  error "todo: Course.Interactive#reverseInteractive"
+  putStrLn "Enter name of file to reverse:" >-
+  getLine >>= \fin ->
+  putStrLn "Name of output file:" >-
+  getLine >>= \fout ->
+  readFile fin >>= \content ->
+  writeFile fout (reverse content) >-
+  putStrLn "File reversed."
 
 -- |
 --
@@ -137,7 +146,14 @@ reverseInteractive =
 encodeInteractive ::
   IO ()
 encodeInteractive =
-  error "todo: Course.Interactive#encodeInteractive"
+  putStrLn "Print string to encode:" >-
+  getLine >>= \s ->
+  putStr "Encoded: " >-
+  putStrLn (s >>= enc) -- List is Monad o_O
+    where enc ' '  = "%20"
+          enc '\t' = "%09"
+          enc '\"' = "%22"
+          enc x    = x :. Nil
 
 interactive ::
   IO ()
