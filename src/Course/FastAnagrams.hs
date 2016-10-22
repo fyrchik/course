@@ -14,8 +14,13 @@ fastAnagrams ::
   Chars
   -> Filename
   -> IO (List Chars)
-fastAnagrams =
-  error "todo: Course.FastAnagrams#fastAnagrams"
+fastAnagrams s f =
+  flip filter (permutations s) <$>
+  (flip S.member <$> (S.fromList . hlist . lines <$> readFile f))
+-- shorter way:
+-- (flip (filter . flip S.member) (permutations s) . S.fromList . hlist . lines) <$> readFile f
+instance Ord NoCaseString where
+  compare = compare `on` map toLower . ncString
 
 newtype NoCaseString =
   NoCaseString {
