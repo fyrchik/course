@@ -77,7 +77,7 @@ headOr ::
   -> a
 headOr =
   foldRight const
-  
+
 
 -- | The product of the elements of a list.
 --
@@ -218,7 +218,7 @@ flattenAgain =
 
 -- | Convert a list of optional values to an optional list of values.
 --
--- * If the list contains all `Full` values, 
+-- * If the list contains all `Full` values,
 -- then return `Full` list of values.
 --
 -- * If the list contains one or more `Empty` values,

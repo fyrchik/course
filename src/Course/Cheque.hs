@@ -323,5 +323,67 @@ fromChar _ =
 dollars ::
   Chars
   -> Chars
-dollars =
-  error "todo: Course.Cheque#dollars"
+dollars s =
+  f d ++ "dollar" ++ getSuffix d ++ " and " ++ f c ++ "cent" ++ getSuffix c
+    where (d,c) = strToPair s
+          f = unwords . filter (not . isEmpty) . reverse . illionify . group
+
+-- full string to pair (dollars, cents)
+strToPair :: Chars -> (List Digit, List Digit)
+strToPair s = let x = norm . reverse . ("0" ++) in
+                x *** x $ span (/= '.') s
+
+getSuffix :: List Digit -> Chars
+getSuffix (One:._) = ""
+getSuffix _        = "s"
+
+-- str to list of digits
+norm :: Chars -> List Digit
+norm = (=<<) (\c -> case fromChar c of -- flatMap
+                      Full x -> x:.Nil
+                      Empty  -> Nil)
+
+-- list of groups to 'illion' (reversed!)
+illionify :: List Digit3 -> List Chars
+illionify Nil = "zero" :. Nil
+illionify (f:.n) =
+  (g2str f ++ " ") :. zipWith (\x y -> if x == "zero" then "" else x ++ " " ++ y) (g2str <$> n) illion
+
+-- string of digits to list of 3-groups
+group :: List Digit -> List Digit3
+group Nil = Nil
+group (x:.y:.z:.t) = D3 z y x :. group t
+group (x:.y:.Nil)  = D2 y x   :. Nil
+group (x:.Nil)     = D1 x     :. Nil
+
+-- group to string
+g2str :: Digit3 -> Chars
+g2str s =
+  case s of
+    D1 x -> showDigit x
+    D2 Zero x -> showDigit x
+    D3 Zero Zero x -> showDigit x
+    D3 Zero x y -> g2str (D2 x y)
+    D3 x Zero Zero -> showDigit x ++ " hundred"
+    D3 x y z -> showDigit x ++ " hundred and " ++ g2str (D2 y z)
+    D2 One x -> case x of
+                  Zero  -> "ten"
+                  One   -> "eleven"
+                  Two   -> "twelve"
+                  Three -> "thirteen"
+                  Four  -> "fourteen"
+                  Five  -> "fifteen"
+                  Six   -> "sixteen"
+                  Seven -> "seventeen"
+                  Eight -> "eighteen"
+                  Nine  -> "nineteen"
+    D2 x Zero -> case x of -- Zero and One matched earlier
+                   Two   -> "twenty"
+                   Three -> "thirty"
+                   Four  -> "fourty"
+                   Five  -> "fifty"
+                   Six   -> "sixty"
+                   Seven -> "seventy"
+                   Eight -> "eighty"
+                   Nine  -> "ninety"
+    D2 x y -> g2str (D2 x Zero) ++ "-" ++ showDigit y
